@@ -78,16 +78,26 @@
           <RowDefinition Height="2*" />
         </Grid.RowDefinitions>
         
-        <Ellipse Grid.Row="1" 
-                 Width="128" 
-                 Height="128"
-                 Fill="{Binding Background, RelativeSource={RelativeSource AncestorType=Window}}" />
-        
-        <Path Grid.Row="1" 
-              Width="80" 
-              Height="80"
-              Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Window}}"
-              Data="M 20,0 L80,40 L20,80 Z" />
+        <Button Grid.Row="1" 
+                Width="128" 
+                Height="128"
+                Background="Transparent"
+                BorderThickness="0"
+                Click="PlayButton_Click"
+                Cursor="Hand">
+          <Button.Content>
+            <Grid>
+              <Ellipse Width="128" 
+                       Height="128"
+                       Fill="{Binding Background, RelativeSource={RelativeSource AncestorType=Window}}" />
+              
+              <Path Width="80" 
+                    Height="80"
+                    Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Window}}"
+                    Data="M 20,0 L80,40 L20,80 Z" />
+            </Grid>
+          </Button.Content>
+        </Button>
       </Grid>
     </Grid>
     

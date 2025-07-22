@@ -100,12 +100,6 @@ This document outlines the tasks required to port the **RegionToShare** applicat
   - Verify that the Avalonia window can be shared in Microsoft Teams, Zoom, and WebEx on Linux Mint.
   - Use X11’s window ID (via `xwininfo`) to ensure conferencing apps recognize the window.
 
-- [ ] **Fallback: Virtual Webcam**
-
-  - If window sharing fails, implement a virtual webcam output using `v4l2loopback`.
-    - Install: `sudo apt install v4l2loopback-dkms`.
-    - Stream FFmpeg output to virtual webcam: `ffmpeg -i input -f v4l2 /dev/video0`.
-  - Test virtual webcam with Teams/Zoom.
 
 - [ ] **Handle Compatibility Issues**
 

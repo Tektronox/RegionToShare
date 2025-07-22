@@ -126,40 +126,65 @@ public partial class MainWindow : Window
     {
         // Handle pointer press on the render target
         // Show the recording window for region selection
+        Console.WriteLine("Play button clicked! Opening recording window...");
+        ShowRecordingWindow();
+    }
+    
+    public void PlayButton_Click(object? sender, RoutedEventArgs e)
+    {
+        // Handle play button click
+        Console.WriteLine("Play button clicked! Opening recording window...");
         ShowRecordingWindow();
     }
 
     private void ShowRecordingWindow()
     {
+        Console.WriteLine("ShowRecordingWindow called");
+        Console.WriteLine($"_recordingWindow is null: {_recordingWindow == null}");
+        Console.WriteLine($"RenderTarget is null: {RenderTarget == null}");
+        
         if (_recordingWindow == null && RenderTarget != null)
         {
+            Console.WriteLine("Creating new recording window...");
             // Get frame rate from the combo box selection
             var fps = GetSelectedFrameRate();
             
-            // Create recording window with render target and settings
-            _recordingWindow = new RecordingWindow(RenderTarget, true, fps);
-            
-            // Subscribe to region changes
-            _recordingWindow.RegionChanged += OnRegionChanged;
-            
-            _recordingWindow.Closed += (s, e) => 
+            try
             {
-                _recordingWindow = null;
+                // Create recording window with render target and settings
+                _recordingWindow = new RecordingWindow(RenderTarget, true, fps);
+                Console.WriteLine("RecordingWindow created successfully");
                 
-                // Stop capture when recording window closes
-                if (_captureService != null)
+                // Subscribe to region changes
+                _recordingWindow.RegionChanged += OnRegionChanged;
+                
+                _recordingWindow.Closed += (s, e) => 
                 {
-                    _ = _captureService.StopCaptureAsync();
-                }
-                
-                // Hide render target and show info area when recording window closes
-                if (RenderTarget != null)
-                    RenderTarget.IsVisible = false;
-            };
+                    Console.WriteLine("Recording window closed - cleaning up");
+                    _recordingWindow = null;
+                    
+                    // Stop capture when recording window closes
+                    if (_captureService != null)
+                    {
+                        _ = _captureService.StopCaptureAsync();
+                    }
+                    
+                    // Hide render target when recording window closes
+                    if (RenderTarget != null)
+                        RenderTarget.IsVisible = false;
+                };
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error creating RecordingWindow: {ex.Message}");
+                Console.WriteLine($"Stack trace: {ex.StackTrace}");
+                return;
+            }
         }
         
         if (_recordingWindow != null)
         {
+            Console.WriteLine("Showing recording window...");
             // Show render target for screen capture display
             if (RenderTarget != null)
                 RenderTarget.IsVisible = true;
@@ -167,8 +192,12 @@ public partial class MainWindow : Window
             _recordingWindow.Show();
             _recordingWindow.Activate();
             
-            // Start screen capture with the recording window's region
-            StartScreenCapture();
+            // DON'T start screen capture here - let RecordingWindow handle it
+            Console.WriteLine("Recording window shown and activated");
+        }
+        else
+        {
+            Console.WriteLine("Failed to show recording window - _recordingWindow is null");
         }
     }
 

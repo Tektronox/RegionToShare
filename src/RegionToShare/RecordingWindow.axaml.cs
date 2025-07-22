@@ -21,6 +21,7 @@ public partial class RecordingWindow : Window
     private bool _drawShadowCursor;
     private int _framesPerSecond;
     private ScreenCaptureService? _captureService;
+    private X11WindowManagementService? _windowManager;
     
     // Dragging and resizing state
     private bool _isDragging = false;
@@ -29,6 +30,9 @@ public partial class RecordingWindow : Window
     private PixelPoint _dragStartPosition;
     private Size _dragStartSize;
     private string _resizeMode = "";
+
+    // Window management
+    private string? _windowId = null;
 
     // Events for region changes
     public event EventHandler<CaptureRegion>? RegionChanged;
@@ -48,6 +52,16 @@ public partial class RecordingWindow : Window
         // Initialize screen capture service
         _captureService = new ScreenCaptureService();
         _captureService.CaptureError += OnCaptureError;
+        
+        // Initialize X11 window management
+        _windowManager = new X11WindowManagementService();
+        _ = Task.Run(async () =>
+        {
+            if (await _windowManager.InitializeAsync())
+            {
+                Console.WriteLine("X11 Window Management initialized for RecordingWindow");
+            }
+        });
     }
 
     private void SetupWindow()
@@ -86,13 +100,8 @@ public partial class RecordingWindow : Window
         // Update capture region if recording is active
         if (_captureService?.IsCapturing == true)
         {
-            var captureRegion = new Rect(
-                mainWindowRect.X,
-                mainWindowRect.Y,
-                mainWindowRect.Width,
-                mainWindowRect.Height
-            );
-            _ = _captureService.UpdateCaptureRegionAsync(captureRegion);
+            var screenRegion = GetScreenRegion();
+            _ = _captureService.UpdateCaptureRegionAsync(screenRegion);
         }
         
         // Notify about region change
@@ -103,9 +112,93 @@ public partial class RecordingWindow : Window
     {
         base.OnOpened(e);
         
-        // Initialize any additional setup after window is opened
-        SetupCapture();
-        UpdateRegionInfo();
+        // Initialize X11 and screen capture on UI thread
+        Avalonia.Threading.Dispatcher.UIThread.Post(async () =>
+        {
+            await InitializeAsync();
+        });
+    }
+    
+    private async Task InitializeAsync()
+    {
+        try
+        {
+            Console.WriteLine("Initializing RecordingWindow...");
+            
+            // Initialize X11 window management
+            await InitializeX11WindowManagementAsync();
+            
+            // Start screen capture for this window
+            await StartScreenCaptureAsync();
+            
+            Console.WriteLine("RecordingWindow initialization complete");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during RecordingWindow initialization: {ex.Message}");
+        }
+    }
+    
+    private async Task InitializeX11WindowManagementAsync()
+    {
+        try
+        {
+            // Initialize window manager on UI thread
+            _windowManager = new X11WindowManagementService();
+            await _windowManager.InitializeAsync();
+            Console.WriteLine("X11 Window Management initialized for RecordingWindow");
+            
+            // Wait a moment for window to be fully created
+            await Task.Delay(100);
+            
+            // Set up window management
+            await SetupX11WindowManagementAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error initializing X11 window management: {ex.Message}");
+        }
+    }
+    
+    private async Task StartScreenCaptureAsync()
+    {
+        if (_renderTarget == null)
+        {
+            Console.WriteLine("No render target available for screen capture");
+            return;
+        }
+        
+        try
+        {
+            // Create screen capture service for this window
+            _captureService = new ScreenCaptureService();
+            
+            // Get current window region in screen coordinates
+            var region = GetScreenRegion();
+            
+            Console.WriteLine($"Starting screen capture for region: {region.X}, {region.Y}, {region.Width}x{region.Height}");
+            
+            var success = await _captureService.StartCaptureAsync(region, _renderTarget, _framesPerSecond);
+            if (success)
+            {
+                Console.WriteLine("RecordingWindow screen capture started successfully");
+            }
+            else
+            {
+                Console.WriteLine("Failed to start RecordingWindow screen capture");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error starting screen capture: {ex.Message}");
+        }
+    }
+    
+    private Rect GetScreenRegion()
+    {
+        // Convert window position to screen coordinates
+        // In Avalonia, window Position is already in screen coordinates
+        return new Rect(Position.X, Position.Y, Width, Height);
     }
 
     protected override void OnClosed(EventArgs e)
@@ -125,12 +218,80 @@ public partial class RecordingWindow : Window
         RegionChanged?.Invoke(this, GetCurrentRegion());
     }
 
+    protected override void OnClosing(WindowClosingEventArgs e)
+    {
+        Console.WriteLine("RecordingWindow closing - cleaning up resources");
+        
+        try
+        {
+            // Stop screen capture
+            if (_captureService != null)
+            {
+                _captureService.StopCaptureAsync().Wait(1000); // Wait max 1 second
+                _captureService.Dispose();
+                _captureService = null;
+                Console.WriteLine("Screen capture stopped and disposed");
+            }
+            
+            // Clean up window manager
+            if (_windowManager != null)
+            {
+                _windowManager.Dispose();
+                _windowManager = null;
+                Console.WriteLine("Window manager disposed");
+            }
+            
+            // Release any input capture - this is handled automatically by Avalonia
+            // No specific release method needed
+            
+            Console.WriteLine("RecordingWindow cleanup complete");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error during RecordingWindow cleanup: {ex.Message}");
+        }
+        
+        base.OnClosing(e);
+    }
+    
     private void UpdateRegionInfo()
     {
-        if (RegionText != null && PositionText != null)
+        // RegionInfoText is not defined in the AXAML, so we'll just log the info
+        var regionInfo = $"Size: {(int)Width}x{(int)Height} Position: {Position.X},{Position.Y}";
+        Console.WriteLine($"Region Info: {regionInfo}");
+    }
+
+    /// <summary>
+    /// Sets up X11 window management for transparent and precise window behavior
+    /// </summary>
+    private async Task SetupX11WindowManagementAsync()
+    {
+        if (_windowManager == null || !_windowManager.IsInitialized)
+            return;
+
+        try
         {
-            RegionText.Text = $"Size: {(int)Width}x{(int)Height}";
-            PositionText.Text = $"Position: {Position.X},{Position.Y}";
+            // Find our window by title
+            _windowId = await _windowManager.FindWindowIdAsync(Title ?? "Region to Share - Source Region");
+            
+            if (!string.IsNullOrEmpty(_windowId))
+            {
+                Console.WriteLine($"Found RecordingWindow with ID: {_windowId}");
+                
+                // Set window properties for optimal behavior
+                await _windowManager.SetWindowAlwaysOnTopAsync(_windowId, true);
+                await _windowManager.SetWindowSkipTaskbarAsync(_windowId, true);
+                
+                Console.WriteLine("Applied X11 window management settings to RecordingWindow");
+            }
+            else
+            {
+                Console.WriteLine("Could not find RecordingWindow ID for X11 management");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error setting up X11 window management: {ex.Message}");
         }
     }
 

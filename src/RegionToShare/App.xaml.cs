@@ -38,6 +38,13 @@ public partial class App : Application
             var testsPassed = await ScreenCaptureTest.TestScreenCaptureAsync();
             System.Console.WriteLine($"Screen capture tests: {(testsPassed ? "PASSED" : "FAILED")}");
             System.Console.WriteLine("=====================================\n");
+            
+            // Test X11 window management
+            System.Console.WriteLine("=== Running X11 Window Management Tests ===");
+            var windowManager = new X11WindowManagementService();
+            var x11TestsPassed = await windowManager.TestWindowManagementAsync();
+            System.Console.WriteLine($"X11 window management tests: {(x11TestsPassed ? "PASSED" : "FAILED")}");
+            System.Console.WriteLine("============================================\n");
         });
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)

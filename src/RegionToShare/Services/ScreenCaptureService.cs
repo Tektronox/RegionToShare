@@ -67,7 +67,9 @@ namespace RegionToShare.Services
         {
             if (_isCapturing)
             {
+                Console.WriteLine("Screen capture already running - stopping previous capture");
                 await StopCaptureAsync();
+                await Task.Delay(100); // Brief delay to ensure cleanup
             }
 
             _captureRegion = region;
