@@ -42,4 +42,5 @@
 - Fix #11: Remember size and position
 
 1.0
-- Initial version
+- Initial version 
+
