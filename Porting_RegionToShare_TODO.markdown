@@ -36,39 +36,39 @@ This document outlines the tasks required to port the **RegionToShare** applicat
 
 ## 2. Replace WPF with Avalonia UI
 
-- [ ] **Port XAML Views**
+- [x] **Port XAML Views**
 
   - Convert WPF XAML files to Avalonia XAML, updating namespaces (e.g., `xmlns="https://github.com/avaloniaui"`).
   - Replace WPF-specific controls (e.g., `Window`, `Border`) with Avalonia equivalents.
   - Remove Windows-specific properties (e.g., `WindowStyle`, `AllowsTransparency`) and use Avalonia alternatives (e.g., `TransparencyLevelHint`, `Background="Transparent"`).
 
-- [ ] **Update Code-Behind**
+- [x] **Update Code-Behind**
 
   - Migrate WPF code-behind to Avalonia, replacing `System.Windows` references with `Avalonia.Controls`.
   - Implement Avalonia’s MVVM pattern using `ReactiveUI` for data binding.
   - Test basic UI functionality (e.g., window opening, resizing) on Linux Mint (Cinnamon desktop).
 
-- [ ] **Style the UI**
+- [x] **Style the UI**
 
   - Apply Avalonia styles to mimic RegionToShare’s look (e.g., transparent window, resizable frame).
   - Test UI rendering on Linux Mint
 
 ## 3. Implement Screen Capture with FFmpeg
 
-- [ ] **Replace Windows Screen Capture**
+- [x] **Replace Windows Screen Capture**
 
   - Remove Windows-specific APIs (e.g., `System.Windows.Forms.Screen`, `System.Drawing`).
   - Implement FFmpeg-based screen capture for a user-selected region.
     - Command example: `ffmpeg -f x11grab -video_size <width>x<height> -i :0.0+<x>,<y> -pix_fmt rgb24 output.png`.
     - Use FFmpeg to capture a region and convert to a format compatible with Avalonia (e.g., bitmap).
 
-- [ ] **Integrate FFmpeg with Avalonia**
+- [x] **Integrate FFmpeg with Avalonia**
 
   - Create a service to invoke FFmpeg commands and stream captured frames.
   - Display captured frames in an Avalonia `Image` control.
   - Optimize frame rate (e.g., 30 FPS) to balance performance and smoothness.
 
-- [ ] **Handle User Region Selection**
+- [x] **Handle User Region Selection**
 
   - Implement a draggable/resizable Avalonia window to let users select the capture region.
   - Store region coordinates (x, y, width, height) and pass them to FFmpeg.

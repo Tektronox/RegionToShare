@@ -9,27 +9,115 @@
         ExtendClientAreaChromeHints="NoChrome"
         SystemDecorations="None"
         TransparencyLevelHint="Transparent"
+        CanResize="False"
         Title="Region to Share - Source Region" Height="450" Width="800">
   <Grid>
-    <Border BorderThickness="{x:Static local:RecordingWindow.BorderSize}">
+    <!-- Main border with gradient for region selection -->
+    <Border Name="MainBorder" 
+            BorderThickness="{x:Static local:RecordingWindow.BorderSize}"
+            Background="Transparent">
       <Border.BorderBrush>
         <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
           <GradientStop Offset="0" Color="{DynamicResource ThemeColor}" />
           <GradientStop Offset="0.5" Color="{DynamicResource ThemeColor}" />
-          <GradientStop Offset="0.5" Color="#10000000" />
-          <GradientStop Offset="1" Color="#10000000" />
+          <GradientStop Offset="0.5" Color="#20000000" />
+          <GradientStop Offset="1" Color="#20000000" />
         </LinearGradientBrush>
       </Border.BorderBrush>
-      <Grid x:Name="ClientArea">
-        <Button Width="16" Height="16" 
+      
+      <Grid Name="ClientArea">
+        <!-- Drag handle for moving the window -->
+        <Grid Name="DragHandle" 
+              Background="Transparent"
+              PointerPressed="DragHandle_PointerPressed"
+              PointerMoved="DragHandle_PointerMoved"
+              PointerReleased="DragHandle_PointerReleased"
+              Cursor="SizeAll" />
+        
+        <!-- Resize handles -->
+        <!-- Top-left resize handle -->
+        <Rectangle Name="ResizeTopLeft" 
+                   Width="10" Height="10"
+                   Fill="Transparent"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top"
+                   Margin="-5,-5,0,0"
+                   Cursor="TopLeftCorner"
+                   PointerPressed="ResizeHandle_PointerPressed"
+                   PointerMoved="ResizeHandle_PointerMoved"
+                   PointerReleased="ResizeHandle_PointerReleased" />
+        
+        <!-- Top-right resize handle -->
+        <Rectangle Name="ResizeTopRight" 
+                   Width="10" Height="10"
+                   Fill="Transparent"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Top"
+                   Margin="0,-5,-5,0"
+                   Cursor="TopRightCorner"
+                   PointerPressed="ResizeHandle_PointerPressed"
+                   PointerMoved="ResizeHandle_PointerMoved"
+                   PointerReleased="ResizeHandle_PointerReleased" />
+        
+        <!-- Bottom-left resize handle -->
+        <Rectangle Name="ResizeBottomLeft" 
+                   Width="10" Height="10"
+                   Fill="Transparent"
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Bottom"
+                   Margin="-5,0,0,-5"
+                   Cursor="BottomLeftCorner"
+                   PointerPressed="ResizeHandle_PointerPressed"
+                   PointerMoved="ResizeHandle_PointerMoved"
+                   PointerReleased="ResizeHandle_PointerReleased" />
+        
+        <!-- Bottom-right resize handle -->
+        <Rectangle Name="ResizeBottomRight" 
+                   Width="10" Height="10"
+                   Fill="Transparent"
+                   HorizontalAlignment="Right"
+                   VerticalAlignment="Bottom"
+                   Margin="0,0,-5,-5"
+                   Cursor="BottomRightCorner"
+                   PointerPressed="ResizeHandle_PointerPressed"
+                   PointerMoved="ResizeHandle_PointerMoved"
+                   PointerReleased="ResizeHandle_PointerReleased" />
+        
+        <!-- Close button -->
+        <Button Name="CloseButton"
+                Width="20" Height="20" 
                 HorizontalAlignment="Right" 
                 VerticalAlignment="Top" 
-                Click="Button_Click">
+                Margin="0,5,5,0"
+                Background="#80FF0000"
+                BorderThickness="0"
+                CornerRadius="10"
+                Click="CloseButton_Click">
           <Path Width="12" Height="12" 
-                Data="M2,2 L10,10 M2,10 L10,2" 
-                Stroke="Black" 
-                StrokeThickness="1" />
+                Data="M3,3 L9,9 M3,9 L9,3" 
+                Stroke="White" 
+                StrokeThickness="2" />
         </Button>
+        
+        <!-- Region info display -->
+        <StackPanel Name="RegionInfo"
+                    Orientation="Horizontal"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Top"
+                    Margin="0,5,0,0"
+                    Background="#80000000"
+                    Spacing="10">
+          <TextBlock Name="RegionText" 
+                     Foreground="White" 
+                     FontSize="12"
+                     Margin="5,2"
+                     Text="Region: 800x450" />
+          <TextBlock Name="PositionText" 
+                     Foreground="White" 
+                     FontSize="12"
+                     Margin="5,2"
+                     Text="Position: 0,0" />
+        </StackPanel>
       </Grid>
     </Border>
   </Grid>

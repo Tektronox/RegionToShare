@@ -18,7 +18,7 @@ public partial class App : Application
 
     public override void OnFrameworkInitializationCompleted()
     {
-        // Test our services during startup
+        // Test our services during startup including new screen capture functionality
         Task.Run(async () =>
         {
             var ffmpegAvailable = await FFmpegService.TestFFmpegAvailabilityAsync();
@@ -32,6 +32,12 @@ public partial class App : Application
                 var version = await FFmpegService.GetFFmpegVersionAsync();
                 System.Console.WriteLine($"FFmpeg: {version}");
             }
+            
+            // Run comprehensive screen capture tests
+            System.Console.WriteLine("\n=== Running Screen Capture Tests ===");
+            var testsPassed = await ScreenCaptureTest.TestScreenCaptureAsync();
+            System.Console.WriteLine($"Screen capture tests: {(testsPassed ? "PASSED" : "FAILED")}");
+            System.Console.WriteLine("=====================================\n");
         });
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
