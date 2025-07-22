@@ -13,11 +13,11 @@ namespace RegionToShare;
 
 public partial class MainWindow : Window
 {
+    private IntPtr _windowHandle;
+    private RecordingWindow? _recordingWindow;
+    
     // ViewModel for data binding
     public MainWindowViewModel ViewModel { get; }
-    
-    // Recording window instance
-    private RecordingWindow? _recordingWindow;
 
     public MainWindow()
     {
@@ -95,20 +95,7 @@ public partial class MainWindow : Window
     public void SubLayer_PointerPressed(object? sender, PointerPressedEventArgs e)
     {
         // Handle pointer press on the render target
-        // Show the recording window for region selection
-        ShowRecordingWindow();
-    }
-
-    private void ShowRecordingWindow()
-    {
-        if (_recordingWindow == null)
-        {
-            _recordingWindow = new RecordingWindow();
-            _recordingWindow.Closed += (s, e) => _recordingWindow = null;
-        }
-        
-        _recordingWindow.Show();
-        _recordingWindow.Activate();
+        // This will be implemented when we add screen capture functionality
     }
 
     // Static method for settings validation (called from App.xaml.cs)

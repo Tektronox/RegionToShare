@@ -36,7 +36,17 @@ public partial class App : Application
 
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            desktop.MainWindow = new MainWindow();
+            // Validate settings before creating main window
+            if (MainWindow.ValidateSettings())
+            {
+                desktop.MainWindow = new MainWindow();
+            }
+            else
+            {
+                // If settings are invalid, exit the application
+                desktop.Shutdown();
+                return;
+            }
         }
 
         base.OnFrameworkInitializationCompleted();

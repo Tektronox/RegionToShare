@@ -4,32 +4,32 @@ This document outlines the tasks required to port the **RegionToShare** applicat
 
 ## 1. Project Setup
 
-- [ ] **Migrate to .NET 8**
+- [x] **Migrate to .NET 8**
 
   - Update the project to target .NET 8 in the `.csproj` file.
   - Replace .NET Framework or older .NET Core references with `<TargetFramework>net8.0</TargetFramework>`.
   - Install .NET 8 SDK on the development machine
   - Test the project build with `dotnet build`.
 
-- [ ] **Add Avalonia UI Dependencies**
+- [x] **Add Avalonia UI Dependencies**
 
   - Add NuGet packages: `Avalonia`, `Avalonia.Desktop`, `Avalonia.Controls`, `Avalonia.ReactiveUI`.
   - Update `.csproj` to include Avalonia project template settings (e.g., `<UseAvalonia>true</UseAvalonia>`).
   - Verify Avalonia setup by creating a basic window.
 
-- [ ] **Set Up FFmpeg**
+- [x] **Set Up FFmpeg**
 
   - Install FFmpeg on Linux Mint: `sudo apt install ffmpeg`.
   - Add FFmpeg wrapper for .NET (e.g., `FFmpeg.AutoGen` or `Xabe.FFmpeg`) via NuGet.
   - Test FFmpeg availability in the app by invoking a simple command (e.g., `ffmpeg -version`).
 
-- [ ] **Set Up X11 Integration**
+- [x] **Set Up X11 Integration**
 
   - Install X11 development libraries: `sudo apt install libx11-dev`.
   - Add a .NET wrapper for X11 (e.g., `Tmds.LibX11` or `SharpX11` via NuGet).
   - Test basic X11 functionality (e.g., querying display info).
 
-- [ ] **Create Project Structure**
+- [x] **Create Project Structure**
 
   - Organize the project into folders: `Views` (XAML), `ViewModels`, `Services` (screen capture, window management), `Models`.
   - Set up a cross-platform build pipeline (e.g., GitHub Actions) for Linux Mint compatibility.

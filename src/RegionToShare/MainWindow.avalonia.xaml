@@ -42,6 +42,7 @@
         
         <ComboBox x:Name="ExtendComboBox"
                   Width="90" 
+                  IsEditable="True" 
                   Margin="0,0,10,0"
                   ToolTip.Tip="Resolution/Extend" />
         

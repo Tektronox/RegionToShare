@@ -35,11 +35,14 @@
     <Compile Remove="NativeMethods.cs" />
     <Compile Remove="RecordingWindow.xaml.cs" />
     <Compile Remove="Properties\Settings.Designer.cs" />
+    <Compile Remove="MainWindow.xaml.cs.original" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="RecordingWindow.xaml" />
     <None Remove="Properties\Settings.settings" />
+    <None Remove="MainWindow.xaml.original" />
+    <None Remove="*.original" />
   </ItemGroup>
 
   <ItemGroup>
